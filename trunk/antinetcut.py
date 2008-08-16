@@ -18,7 +18,7 @@ if os.getuid():
    print "This script must be run as 'root'"
    exit(2)
 if len(gw) > 0:
-   myIP=gw
+   gwIP=gw
 else:
    #get the IP address of the gateway
    pipe1 =os.popen("./getdefaultgw.sh",'r')
