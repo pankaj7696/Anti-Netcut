@@ -22,7 +22,7 @@ def startManagementInterface(daemon,logger):
         server = SimpleXMLRPCServer.SimpleXMLRPCServer(('localhost',46201))
         server.register_instance(ManagementInterface(daemon))
         server.serve_forever()
-        logger.info("Starting XMLRPC Server")
+        logger.info("Starting XMLRPC Server on localhost:46201")
     except:
         logger.error("Error starting XMLRPC Server")
     #TODO: Implement this...

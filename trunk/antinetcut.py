@@ -27,15 +27,17 @@ class AntiNetCut(UnixDaemon):
             except:
                 self.logger.error("Unexpected Error, Terminating %s" % str(sys.exc_info()))
     def startService(self):
+        self.logger.info("Stopping Protection Thread from XMLRPC Command..")
         self.shouldRun = True
         return True
     def stopService(self):
+        self.logger.info("Stopping Protection Thread from XMLRPC Command..")
         self.shouldRun = False
         self.protectionThread.shouldRun = False
         return True
     def _startAntiNetCut(self):
         #YOU MUST CHANGE THIS TO MATCH YOUR DEVICE
-        device="eth0"
+        device="eth1"
         gw="" #Leave this if you want the automatic detection, enter your gateway if you want to turn the automatic detection off
         
         #DO NOT MODIFY UNDER THIS LINE
@@ -52,7 +54,8 @@ class AntiNetCut(UnixDaemon):
            gwIP=gw
         else:
            #get the IP address of the gateway
-           pipe1 =os.popen("./getdefaultgw.sh",'r')
+           self.logger.info("Running %s" % (sys.path[0] + "/getdefaultgw.sh")) 
+           pipe1 =os.popen(sys.path[0] + "/getdefaultgw.sh",'r')
            gwIP=pipe1.readline()
            pipe1.close()
         #get the mac address of the gateway
@@ -95,7 +98,7 @@ class AntiNetCut(UnixDaemon):
         
         p1=Ether(dst="ff:ff:ff:ff:ff:ff",src=myMAC)/ARP(pdst="255.255.255.255",psrc=myIP,op=1,hwsrc=myMAC,hwdst="00:00:00:00:00:00")
         p2=Ether(dst="ff:ff:ff:ff:ff:ff",src=myMAC)/ARP(pdst=gwIP,psrc=myIP,op=2,hwsrc=myMAC,hwdst=mac)
-        self.protectionThread = ProtectionThread(p1,p2,logger)
+        self.protectionThread = ProtectionThread(p1,p2,self.logger)
         self.protectionThread.start()
 def main(): 
     service = AntiNetCut(pidfile = '/var/run/antinetcut.pid',name='antinetcut')
