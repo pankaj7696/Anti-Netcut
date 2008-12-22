@@ -1,79 +1,67 @@
-#! /usr/bin/env python
+from UnixDaemon import UnixDaemon
+from daemonCode import *
+from ManagementXMLRPC import *
+from ManagementDaemon import *
+import sys,time
 
+class AntiNetCut(UnixDaemon):
+    def run(self):
+            self.logger.info("Starting Service")
+            try:
+                self.shouldRun = False
+                firstRun = True
+                while self.shouldRun== False:
+                    if firstRun==True:
+                        self.shouldRun = True
+                    while self.shouldRun== True:
+                        self.logger.error("HEY")
+                        time.sleep(3)
+                    firstRun= False
+                    time.sleep(2)
+            except:
+                self.logger.error("Unexpected Error, Terminating %s" % str(sys.exc_info()))
+    def startService(self):
+        self.shouldRun = True
+        return True
+    def stopService(self):
+        self.shouldRun = False
+        return True
+            #runAntiNetCut(self.logger)
+def main(): 
+    service = AntiNetCut(pidfile = '/var/run/antinetcut.pid',name='antinetcut')
+    management = ManagementDaemon(service= service, pidfile = '/var/run/antinetcut-XMLRPC.pid',name='antinetcut-XMLRPC')
+    if len(sys.argv) == 2:
+        if 'start' == sys.argv[1]:
+            management.start()
+            service.start()
+            sys.exit(0)
+        elif 'stop' == sys.argv[1]:
+            service.stop()
+            management.stop()
+        elif 'status' == sys.argv[1]:
+            ret = service.status()
+            if ret:
+                print "Antinetcut daemon is running..."
+            else:
+                print "Antinetcut daemon is NOT running..."
 
-import sys
-from scapy.all import *
-#YOU MUST CHANGE THIS TO MATCH YOUR DEVICE
+            ret2 = management.status()
+            if ret2:
+                print "Antinetcut management daemon is running..."
+            else:
+                print "Antinetcut management daemon is NOT running..."
+            
+        elif 'restart' == sys.argv[1]:
+            service.restart()
+        else:
+            print "Invalid argument"
+            printUsage()
+        sys.exit(0)
+    else:
+        printUsage()
+def printUsage():
+    print "Usage: %s start|stop|status|restart" % sys.argv[0]
+    sys.exit(2)
 
-device="eth0"
-gw="" #Leave this if you want the automatic detection, enter your gateway if you want to turn the automatic detection off
-
-#DO NOT MODIFY UNDER THIS LINE
-print """Welcome To AntiNetCut Version 2
-Development done by AhmedSoliman.com <me@ahmedsoliman.com>
-Released August 2008"""
-
-if os.getuid():
-   print ''
-   print "This script must be run as 'root'"
-   exit(2)
-if len(gw) > 0:
-   gwIP=gw
-else:
-   #get the IP address of the gateway
-   pipe1 =os.popen("./getdefaultgw.sh",'r')
-   gwIP=pipe1.readline()
-   pipe1.close()
-#get the mac address of the gateway
-mac=getmacbyip(gwIP)
-if mac == None:
-   print "We couldn't get the gateway MAC address, sorry"
-   exit(3)
-print 'MAC Address Detected for the gateway %s %s' % (gwIP,mac)
-print 'Deleting Current gateway mac address from the arp table'
-if os.system("arp -d " +  gwIP):
-   print "Couldn't delete the gateway from your arp table"
-   exit(2)
-print 'Adding static entry...'
-if os.system("arp -s " + gwIP + " " + mac):
-   print "Couldn't add the static entry"
-
-#get my MAC address
-pipe2=os.popen("ip addr show dev " + device + "|awk '/ether/{ print $2 }'",'r')
-myMAC=pipe2.readline()
-myMAC=myMAC.strip("\n")
-pipe2.close()
-if not len(myMAC) > 0:
-   print "Cannot Detect my MAC address"
-   exit(3)
-#get my IP address
-pipe3=os.popen("ip addr show dev " +device+" |awk '/inet /{ print $2 }'",'r')
-myIP=pipe3.readline()
-myIP=myIP[:myIP.find("/")]
-pipe3.close()
-if not len(myIP) >0:
-   print "Cannot Detect my IP address"
-   exit(4)
-print "Our IP Address is " + myIP
-print "Out MAC Address is " + myMAC
-print ''
-print "Running Protection Thread"
-
-p1=Ether(dst="ff:ff:ff:ff:ff:ff",src=myMAC)/ARP(pdst="255.255.255.255",psrc=myIP,op=1,hwsrc=myMAC,hwdst="00:00:00:00:00:00")
-p2=Ether(dst="ff:ff:ff:ff:ff:ff",src=myMAC)/ARP(pdst=gwIP,psrc=myIP,op=2,hwsrc=myMAC,hwdst=mac)
-#p1=ARP()
-#p1.op=1
-#p1.hwsrc=myMAC
-#p1.hwdst="00:00:00:00:00:00"
-#p1.psrc=myIP
-#p1.pdst="255.255.255.255"
-
-#p2=ARP()
-#p2.op=2
-
-while 1:
-   sendp(p1,verbose=0)
-   sendp(p2,verbose=0)
-   time.sleep(.7)
-
-#print 'Hello World'
+if __name__ == "__main__":
+    main()
