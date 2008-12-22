@@ -9,6 +9,7 @@ class ProtectionThread(threading.Thread):
         self.packet2 = p2
         self.logger = logger
         self.shouldRun = True
+        threading.Thread.__init__(self)
     
     def run(self):
         self.logger.info("Protection Thread Started..")
