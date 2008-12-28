@@ -1,12 +1,14 @@
 from UnixDaemon import UnixDaemon
-from daemonCode import *
 from ManagementXMLRPC import *
-from ManagementDaemon import *
 from AntiNetCutClass import *
 from scapy.all import *
-import sys,time
+import sys,time,os
 
-def main(): 
+def main():
+    #basic checking
+    if os.getuid():
+        print "Operation Not Permitted. User must be root."
+        sys.exit(1)
     service = AntiNetCut(pidfile = '/var/run/antinetcut.pid',name='antinetcut')    
     if len(sys.argv) == 2:
         if 'start' == sys.argv[1]:

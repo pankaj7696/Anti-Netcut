@@ -15,7 +15,7 @@ class ManagementInterface:
         return True
     
     def status(self):
-        return self.daemon.status()
+        return self.daemon.protectionStatus()
     
 def startManagementInterface(daemon,logger):
     logger.info("Starting XMLRPC Server")

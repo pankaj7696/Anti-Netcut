@@ -1,5 +1,4 @@
 from UnixDaemon import UnixDaemon
-from daemonCode import *
 from ManagementXMLRPC import *
 from scapy.all import *
 import sys,time
@@ -16,7 +15,6 @@ class AntiNetCut(UnixDaemon):
     def waitLoop(self):
         while not self.shouldRun:
             time.sleep(1)
-            self.logger.info("Waiting Loop")
             
     def terminate(self):
         self.shouldRun = False
@@ -26,7 +24,8 @@ class AntiNetCut(UnixDaemon):
         self.logger.info("Resume Called..")
         self.shouldTerminate = False
         self.shouldRun = True
-        
+    def protectionStatus(self):
+        return self.shouldRun
     def pause(self):
         self.logger.info("Pause Called..")
         self.shouldTerminate = False
@@ -52,6 +51,7 @@ class AntiNetCut(UnixDaemon):
                 if i[0] == 0:
                     gwIP = i[2]
                     device = i[3]
+                    myIP = i[4]
         if not gwIP:
             self.logger.error("Fatal Error: There is no gateway detected, Please specify it in the configuration file.")
             sys.exit(5)
@@ -65,16 +65,15 @@ class AntiNetCut(UnixDaemon):
            self.logger.error("Error: Couldn't delete the gateway from your arp table")
 
         self.logger.info( 'Adding static entry...')
-        if os.system("arp -s " + gwIP + " " + mac):
+        if os.system("arp -s %s %s" % (gwIP, mac)):
            self.logger.error("Couldn't add the static entry: %s" % sys.exc_info())
         #get my MAC address
+        self.logger.info("Device is %s" % device)
         myMAC = get_if_hwaddr(device)
-        pipe2.close()
         if not len(myMAC) > 0:
            self.logger.error("Fatal Error: Cannot Detect my MAC address: %s" % sys.exc_info())
            exit(3)
         #get my IP address
-        myIP = get_if_addr(device)
         if not len(myIP) >0:
            self.logger.error("Fatal Error: Cannot Detect my IP address: %s" % sys.exc_info())
            exit(4)
