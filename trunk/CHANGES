@@ -1,0 +1,5 @@
+29-12-2008 Version 0.25 Released
+	* Now supports Unix/Linux and Mac OS X
+	* Works as a daemon, no longer require you to keep the terminal open
+	* Can be controlled by XMLRPC Server stop() start() and status() operations
+	* No more shell scripts, uses Unix primitives directly.

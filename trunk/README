@@ -1,0 +1,11 @@
+Welcome to Antinetcut
+=====================
+
+This document describes how simply you can use antinetcut to protect yourself against NetCut attacks if you are under Unix/Linux or Mac OS X.
+
+The process is very simply, you first must run those commands as root.
+
+# python antinetcut.py start
+
+this should start the antinetcut daemon, and you can close the terminal as it's now running in the background.
+You can check the status of operation using the log file in /var/log/antinetcut.log
