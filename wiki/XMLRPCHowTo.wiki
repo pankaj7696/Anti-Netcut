@@ -7,7 +7,7 @@ XMLRPC is a way to do formal Remote Procedure Calls, it uses XML as the marshall
 
 XMLRPC server is bundled with antinetcut to allow developers to integrate their work with antinetcut, such as building Gnome Applet or any GUI interface to control antinetcut instead of using the command line interface.
 
-= Example =
+= Example (Super Simple) =
 
 I'll explain here how can you use xmlrpclib python module to bind and use antinetcut services.
 
