@@ -1,14 +1,6 @@
 #labels Phase-Deploy,Featured
 #Installation guide for antinetcut under Mac OS X Leopard
 
-= Introduction =
+== Introduction ==
 
-A few words should be put here
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+Please look for "How to Install scapy" Under Mac OS X. then run antinetcut the same way you do for Linux/Unix
