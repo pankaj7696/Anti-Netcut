@@ -3,12 +3,13 @@
 
 = Requirements =
 
- * Python
+ * Python 2.5+
  * Libpcap (Not necessary if you are under Linux)
 
 = Details =
 
 Simply start the antinetcut service by this command
-_# python antinetcut.py start_
+
+_# ./antinetcut.py start_
 
 and you can know if everything went OK or not in the log file at /var/log/antinetcut.log
